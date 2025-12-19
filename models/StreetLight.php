@@ -9,6 +9,10 @@ class StreetLight {
     public $light_id;
     public $name;
     public $city;
+    public $state;
+    public $district;
+    public $taluk;
+    public $ward_number;
     public $latitude;
     public $longitude;
     public $address;
@@ -43,6 +47,32 @@ class StreetLight {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function search($filters = [], $forMap = false) {
+        $select = $forMap
+            ? "SELECT id, light_id, name, latitude, longitude, address, status"
+            : "SELECT *";
+        $query = $select . " FROM " . $this->table . " WHERE 1=1";
+
+        $params = [];
+        $types = "";
+
+        if (!empty($filters['city'])) { $query .= " AND city = ?"; $params[] = $filters['city']; $types .= 's'; }
+        if (!empty($filters['state'])) { $query .= " AND state = ?"; $params[] = $filters['state']; $types .= 's'; }
+        if (!empty($filters['district'])) { $query .= " AND district = ?"; $params[] = $filters['district']; $types .= 's'; }
+        if (!empty($filters['taluk'])) { $query .= " AND taluk = ?"; $params[] = $filters['taluk']; $types .= 's'; }
+        if (!empty($filters['ward'])) { $query .= " AND ward_number = ?"; $params[] = $filters['ward']; $types .= 's'; }
+        if (!empty($filters['status'])) { $query .= " AND status = ?"; $params[] = $filters['status']; $types .= 's'; }
+
+        $query .= " ORDER BY name ASC";
+
+        $stmt = $this->conn->prepare($query);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function getById($lightId) {
         $query = "SELECT * FROM " . $this->table . " WHERE light_id = ?";
         $stmt = $this->conn->prepare($query);
@@ -74,6 +104,38 @@ class StreetLight {
         $stmt->execute();
 
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getFilterOptions($city = null) {
+        $options = [
+            'states' => [],
+            'districts' => [],
+            'taluks' => [],
+            'wards' => [],
+            'statuses' => [],
+        ];
+
+        $base = "FROM " . $this->table . " WHERE 1=1";
+        $types = '';
+        $params = [];
+        if ($city) { $base .= " AND city = ?"; $types .= 's'; $params[] = $city; }
+
+        $options['states'] = $this->distinct("state", $base, $types, $params);
+        $options['districts'] = $this->distinct("district", $base, $types, $params);
+        $options['taluks'] = $this->distinct("taluk", $base, $types, $params);
+        $options['wards'] = $this->distinct("ward_number", $base, $types, $params);
+        $options['statuses'] = $this->distinct("status", $base, $types, $params);
+
+        return $options;
+    }
+
+    private function distinct($column, $base, $types, $params) {
+        $query = "SELECT DISTINCT $column as value " . $base . " AND $column IS NOT NULL AND $column <> '' ORDER BY $column ASC";
+        $stmt = $this->conn->prepare($query);
+        if (!empty($params)) { $stmt->bind_param($types, ...$params); }
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        return array_map(function($row){ return $row['value']; }, $res);
     }
 }
 ?>

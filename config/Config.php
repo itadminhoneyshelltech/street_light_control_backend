@@ -34,4 +34,7 @@ define('ITEMS_PER_PAGE', 50);
 
 // Error Logging
 define('LOG_PATH', __DIR__ . '/../logs/');
+
+// OpenAI Configuration
+define('OPENAI_API_KEY', getenv('OPENAI_API_KEY') ?: '');
 ?>

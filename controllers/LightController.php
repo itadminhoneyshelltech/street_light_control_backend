@@ -16,9 +16,16 @@ class LightController {
 
     public function getLights() {
         $user = AuthMiddleware::authenticate();
-        $city = $_GET['city'] ?? $user['city'];
+        $filters = [
+            'city' => $_GET['city'] ?? $user['city'] ?? null,
+            'state' => $_GET['state'] ?? null,
+            'district' => $_GET['district'] ?? null,
+            'taluk' => $_GET['taluk'] ?? null,
+            'ward' => $_GET['ward'] ?? null,
+            'status' => $_GET['status'] ?? null,
+        ];
 
-        $lights = $this->streetLight->getAll($city);
+        $lights = $this->streetLight->search($filters, false);
         Response::success($lights, 'Lights retrieved successfully');
     }
 
@@ -148,10 +155,23 @@ class LightController {
 
     public function getLightsForMap() {
         $user = AuthMiddleware::authenticate();
-        $city = $_GET['city'] ?? $user['city'];
-
-        $lights = $this->streetLight->getByCity($city);
+        $filters = [
+            'city' => $_GET['city'] ?? $user['city'] ?? null,
+            'state' => $_GET['state'] ?? null,
+            'district' => $_GET['district'] ?? null,
+            'taluk' => $_GET['taluk'] ?? null,
+            'ward' => $_GET['ward'] ?? null,
+            'status' => $_GET['status'] ?? null,
+        ];
+        $lights = $this->streetLight->search($filters, true);
         Response::success($lights, 'Map data retrieved');
+    }
+
+    public function getLightFilters() {
+        $user = AuthMiddleware::authenticate();
+        $city = $_GET['city'] ?? $user['city'] ?? null;
+        $options = $this->streetLight->getFilterOptions($city);
+        Response::success($options, 'Filter options');
     }
 }
 ?>

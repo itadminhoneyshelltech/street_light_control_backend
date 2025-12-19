@@ -47,6 +47,9 @@ require_once __DIR__ . '/controllers/LightController.php';
 require_once __DIR__ . '/controllers/CCMSController.php';
 require_once __DIR__ . '/controllers/DeviceController.php';
 require_once __DIR__ . '/controllers/InspectionController.php';
+require_once __DIR__ . '/controllers/AIChatbotController.php';
+require_once __DIR__ . '/controllers/FeederPanelController.php';
+require_once __DIR__ . '/controllers/ReportsController.php';
 
 // Initialize database
 $database = new Database();
@@ -85,6 +88,11 @@ $router->get('/lights/summary', function() use ($conn) {
 $router->get('/lights/map', function() use ($conn) {
     $controller = new LightController($conn);
     $controller->getLightsForMap();
+});
+
+$router->get('/lights/filters', function() use ($conn) {
+    $controller = new LightController($conn);
+    $controller->getLightFilters();
 });
 
 $router->post('/lights/control', function() use ($conn) {
@@ -141,6 +149,68 @@ $router->post('/ccms/alerts/resolve', function() use ($conn) {
 $router->get('/ccms/dashboard-summary', function() use ($conn) {
     $controller = new CCMSController($conn);
     $controller->getDashboardSummary();
+});
+
+// Feeder Panel Routes (CCMS Switching Points)
+$router->get('/feeder-panels/list', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->list();
+});
+
+$router->get('/feeder-panels/status', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->getStatus();
+});
+
+$router->post('/feeder-panels/control', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->control();
+});
+
+$router->get('/feeder-panels/energy', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->getEnergyData();
+});
+
+$router->get('/feeder-panels/faults', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->getFaults();
+});
+
+$router->post('/feeder-panels/maintenance', function() use ($conn) {
+    $controller = new FeederPanelController($conn);
+    $controller->createMaintenanceRequest();
+});
+
+// Reports Routes
+$router->get('/reports/energy-saving', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getEnergySavingReport();
+});
+
+$router->get('/reports/lamp-failure', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getLampFailureReport();
+});
+
+$router->get('/reports/uptime', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getUptimeReport();
+});
+
+$router->get('/reports/maintenance', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getMaintenanceReport();
+});
+
+$router->get('/reports/contractor-performance', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getContractorPerformanceReport();
+});
+
+$router->get('/reports/asset-inventory', function() use ($conn) {
+    $controller = new ReportsController($conn);
+    $controller->getAssetInventoryReport();
 });
 
 // Device Communication Routes (NEW)
@@ -225,6 +295,22 @@ $router->get('/inspection/stats', function() use ($conn) {
     $controller->getInspectionStats();
 });
 
+// AI Chatbot Routes
+$router->post('/ai-chatbot/message', function() use ($conn) {
+    $controller = new AIChatbotController($conn);
+    $controller->processMessage();
+});
+
+$router->get('/ai-chatbot/conversation', function() use ($conn) {
+    $controller = new AIChatbotController($conn);
+    $controller->getConversationHistory();
+});
+
+$router->post('/ai-chatbot/feedback', function() use ($conn) {
+    $controller = new AIChatbotController($conn);
+    $controller->submitFeedback();
+});
+
 // Health check
 $router->get('/health', function() {
     Response::success(['status' => 'Backend server is running']);
@@ -237,7 +323,10 @@ $router->get('/', function() {
         'lights' => '/lights/list, /lights/detail, /lights/summary, /lights/map',
         'device' => '/device/configure, /device/status, /device/commands, /device/command-ack, /device/alert, /device/health, /device/firmware, /device/logs, /device/sync',
         'ccms' => '/ccms/meter-data, /ccms/energy-parameters, /ccms/schedule, /ccms/battery-status, /ccms/alerts, /ccms/dashboard-summary',
+        'feeder-panels' => '/feeder-panels/list, /feeder-panels/status, /feeder-panels/control, /feeder-panels/energy, /feeder-panels/faults, /feeder-panels/maintenance',
+        'reports' => '/reports/energy-saving, /reports/lamp-failure, /reports/uptime, /reports/maintenance, /reports/contractor-performance, /reports/asset-inventory',
         'inspection' => '/inspection/start, /inspection/photo, /inspection/gps, /inspection/complete, /inspection/history, /inspection/pending, /inspection/stats',
+        'ai-chatbot' => '/ai-chatbot/message, /ai-chatbot/conversation, /ai-chatbot/feedback',
         'health' => '/health'
     ]]);
 });
