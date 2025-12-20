@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspection Endpoint Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .endpoint {
+            background: #f5f5f5;
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            font-family: monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .response.error {
+            border-left-color: #f44336;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .notes {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #1565c0;
+        }
+        
+        .flow-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-top: 20px;
+        }
+        
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .flow-step {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+        
+        .flow-step.completed {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        
+        .flow-step.active {
+            border-left-color: #ffc107;
+            background: #fff8e1;
+        }
+        
+        .flow-step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .flow-step-desc {
+            font-size: 0.85em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔦 Inspection API Tester</h1>
+        
+        <div class="flow-container">
+            <h2>Inspection Flow</h2>
+            <div class="flow-steps">
+                <div class="flow-step" id="step-1">
+                    <div class="flow-step-title">1. Start</div>
+                    <div class="flow-step-desc">Create inspection record</div>
+                </div>
+                <div class="flow-step" id="step-2">
+                    <div class="flow-step-title">2. Photo</div>
+                    <div class="flow-step-desc">Upload photo data</div>
+                </div>
+                <div class="flow-step" id="step-3">
+                    <div class="flow-step-title">3. GPS</div>
+                    <div class="flow-step-desc">Record coordinates</div>
+                </div>
+                <div class="flow-step" id="step-4">
+                    <div class="flow-step-title">4. Complete</div>
+                    <div class="flow-step-desc">Finalize inspection</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- Start Inspection -->
+            <div class="card">
+                <h2>1️⃣ Start Inspection</h2>
+                <div class="endpoint">POST /api/inspection/start</div>
+                <div class="notes">Create a new inspection record</div>
+                
+                <div class="input-group">
+                    <label>Light ID:</label>
+                    <input type="text" id="start_light_id" placeholder="SL001" value="SL001">
+                </div>
+                
+                <div class="input-group">
+                    <label>Ward Number:</label>
+                    <input type="number" id="start_ward" placeholder="100" value="100">
+                </div>
+                
+                <div class="input-group">
+                    <label>Notes:</label>
+                    <textarea id="start_notes" placeholder="Field inspection notes">Initial inspection</textarea>
+                </div>
+                
+                <button onclick="startInspection()">Start Inspection</button>
+                <div id="start_status"></div>
+                <div id="start_response"></div>
+            </div>
+            
+            <!-- Upload Photo -->
+            <div class="card">
+                <h2>📸 Upload Photo</h2>
+                <div class="endpoint">POST /api/inspection/photo</div>
+                <div class="notes">Send photo data (base64)</div>
+                
+                <div class="input-group">
+                    <label>Inspection ID:</label>
+                    <input type="number" id="photo_inspection_id" placeholder="Will be set from Start">
+                </div>
+                
+                <div class="input-group">
+                    <label>Photo (Base64):</label>
+                    <textarea id="photo_data" placeholder="Base64 encoded image data"></textarea>
+                </div>
+                
+                <button onclick="uploadPhoto()">Upload Photo</button>
+                <div id="photo_status"></div>
+                <div id="photo_response"></div>
+            </div>
+            
+            <!-- Record GPS -->
+            <div class="card">
+                <h2>📍 Record GPS</h2>
+                <div class="endpoint">POST /api/inspection/gps</div>
+                <div class="notes">Send GPS coordinates</div>
+                
+                <div class="input-group">
+                    <label>Inspection ID:</label>
+                    <input type="number" id="gps_inspection_id" placeholder="Will be set from Start">
+                </div>
+                
+                <div class="input-group">
+                    <label>Latitude:</label>
+                    <input type="number" id="gps_lat" step="0.000001" placeholder="17.3603" value="17.3603">
+                </div>
+                
+                <div class="input-group">
+                    <label>Longitude:</label>
+                    <input type="number" id="gps_lon" step="0.000001" placeholder="78.4734" value="78.4734">
+                </div>
+                
+                <button onclick="recordGPS()">Record GPS</button>
+                <div id="gps_status"></div>
+                <div id="gps_response"></div>
+            </div>
+            
+            <!-- Complete Inspection -->
+            <div class="card">
+                <h2>✅ Complete Inspection</h2>
+                <div class="endpoint">POST /api/inspection/complete</div>
+                <div class="notes">Finalize inspection and save status</div>
+                
+                <div class="input-group">
+                    <label>Inspection ID:</label>
+                    <input type="number" id="complete_inspection_id" placeholder="Will be set from Start">
+                </div>
+                
+                <div class="input-group">
+                    <label>Light Status:</label>
+                    <select id="complete_status">
+                        <option value="on">ON</option>
+                        <option value="off">OFF</option>
+                        <option value="error">ERROR</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Brightness (0-100):</label>
+                    <input type="number" id="complete_brightness" min="0" max="100" placeholder="100" value="100">
+                </div>
+                
+                <button onclick="completeInspection()">Complete Inspection</button>
+                <div id="complete_status_div"></div>
+                <div id="complete_response"></div>
+            </div>
+            
+            <!-- Get History -->
+            <div class="card">
+                <h2>📋 Inspection History</h2>
+                <div class="endpoint">GET /api/inspection/history</div>
+                <div class="notes">Retrieve past inspections for a light</div>
+                
+                <div class="input-group">
+                    <label>Light ID:</label>
+                    <input type="text" id="history_light_id" placeholder="SL001" value="SL001">
+                </div>
+                
+                <button onclick="getHistory()">Get History</button>
+                <div id="history_status"></div>
+                <div id="history_response"></div>
+            </div>
+            
+            <!-- Get Pending -->
+            <div class="card">
+                <h2>⏳ Pending Inspections</h2>
+                <div class="endpoint">GET /api/inspection/pending</div>
+                <div class="notes">Get lights needing inspection for a ward</div>
+                
+                <div class="input-group">
+                    <label>Ward Number:</label>
+                    <input type="number" id="pending_ward" placeholder="100" value="100">
+                </div>
+                
+                <button onclick="getPending()">Get Pending</button>
+                <div id="pending_status"></div>
+                <div id="pending_response"></div>
+            </div>
+            
+            <!-- Get Stats -->
+            <div class="card">
+                <h2>📊 Inspection Stats</h2>
+                <div class="endpoint">GET /api/inspection/stats</div>
+                <div class="notes">Today's inspection statistics</div>
+                
+                <button onclick="getStats()">Get Stats</button>
+                <div id="stats_status"></div>
+                <div id="stats_response"></div>
+            </div>
+            
+            <!-- Generate Demo Data -->
+            <div class="card">
+                <h2>🎯 Demo Tools</h2>
+                <div class="endpoint">Utility Functions</div>
+                <div class="notes">Generate sample data for testing</div>
+                
+                <button onclick="generateBase64Sample()">Generate Sample Base64</button>
+                <div id="demo_status"></div>
+                <div id="demo_response"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let inspectionId = null;
+        
+        function updateFlowStep(step, status) {
+            const stepElement = document.getElementById(`step-${step}`);
+            stepElement.classList.remove('active', 'completed');
+            if (status === 'completed') {
+                stepElement.classList.add('completed');
+            } else if (status === 'active') {
+                stepElement.classList.add('active');
+            }
+        }
+        
+        async function makeRequest(endpoint, method, data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_URL}${endpoint}`, options);
+                const result = await response.json();
+                
+                return {
+                    status: response.status,
+                    success: response.ok,
+                    data: result
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+        
+        async function startInspection() {
+            const lightId = document.getElementById('start_light_id').value;
+            const ward = document.getElementById('start_ward').value;
+            const notes = document.getElementById('start_notes').value;
+            
+            updateFlowStep(1, 'active');
+            showStatus('start_status', 'Loading...', 'loading');
+            
+            const result = await makeRequest('/inspection/start', 'POST', {
+                light_id: lightId,
+                ward_number: ward,
+                notes: notes
+            });
+            
+            if (result.success) {
+                inspectionId = result.data.inspection_id;
+                document.getElementById('photo_inspection_id').value = inspectionId;
+                document.getElementById('gps_inspection_id').value = inspectionId;
+                document.getElementById('complete_inspection_id').value = inspectionId;
+                
+                updateFlowStep(1, 'completed');
+                showStatus('start_status', '✓ Inspection started! ID: ' + inspectionId, 'success');
+                showResponse('start_response', result.data);
+            } else {
+                showStatus('start_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('start_response', result.data, true);
+            }
+        }
+        
+        async function uploadPhoto() {
+            const inspId = document.getElementById('photo_inspection_id').value;
+            const photoData = document.getElementById('photo_data').value;
+            
+            if (!inspId) {
+                showStatus('photo_status', '✗ Please start inspection first', 'error');
+                return;
+            }
+            
+            updateFlowStep(2, 'active');
+            showStatus('photo_status', 'Uploading...', 'loading');
+            
+            const result = await makeRequest('/inspection/photo', 'POST', {
+                inspection_id: inspId,
+                photo_base64: photoData
+            });
+            
+            if (result.success) {
+                updateFlowStep(2, 'completed');
+                showStatus('photo_status', '✓ Photo uploaded successfully', 'success');
+                showResponse('photo_response', result.data);
+            } else {
+                showStatus('photo_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('photo_response', result.data, true);
+            }
+        }
+        
+        async function recordGPS() {
+            const inspId = document.getElementById('gps_inspection_id').value;
+            const lat = document.getElementById('gps_lat').value;
+            const lon = document.getElementById('gps_lon').value;
+            
+            if (!inspId) {
+                showStatus('gps_status', '✗ Please start inspection first', 'error');
+                return;
+            }
+            
+            updateFlowStep(3, 'active');
+            showStatus('gps_status', 'Recording...', 'loading');
+            
+            const result = await makeRequest('/inspection/gps', 'POST', {
+                inspection_id: inspId,
+                latitude: lat,
+                longitude: lon
+            });
+            
+            if (result.success) {
+                updateFlowStep(3, 'completed');
+                showStatus('gps_status', '✓ GPS recorded successfully', 'success');
+                showResponse('gps_response', result.data);
+            } else {
+                showStatus('gps_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('gps_response', result.data, true);
+            }
+        }
+        
+        async function completeInspection() {
+            const inspId = document.getElementById('complete_inspection_id').value;
+            const status = document.getElementById('complete_status').value;
+            const brightness = document.getElementById('complete_brightness').value;
+            
+            if (!inspId) {
+                showStatus('complete_status_div', '✗ Please start inspection first', 'error');
+                return;
+            }
+            
+            updateFlowStep(4, 'active');
+            showStatus('complete_status_div', 'Completing...', 'loading');
+            
+            const result = await makeRequest('/inspection/complete', 'POST', {
+                inspection_id: inspId,
+                light_status: status,
+                brightness_level: brightness
+            });
+            
+            if (result.success) {
+                updateFlowStep(4, 'completed');
+                showStatus('complete_status_div', '✓ Inspection completed!', 'success');
+                showResponse('complete_response', result.data);
+                
+                // Reset flow
+                setTimeout(() => {
+                    inspectionId = null;
+                    document.getElementById('photo_inspection_id').value = '';
+                    document.getElementById('gps_inspection_id').value = '';
+                    document.getElementById('complete_inspection_id').value = '';
+                    updateFlowStep(1, '');
+                    updateFlowStep(2, '');
+                    updateFlowStep(3, '');
+                    updateFlowStep(4, '');
+                }, 3000);
+            } else {
+                showStatus('complete_status_div', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('complete_response', result.data, true);
+            }
+        }
+        
+        async function getHistory() {
+            const lightId = document.getElementById('history_light_id').value;
+            showStatus('history_status', 'Loading...', 'loading');
+            
+            const result = await makeRequest(`/inspection/history?light_id=${lightId}`, 'GET');
+            
+            if (result.success) {
+                showStatus('history_status', '✓ History retrieved', 'success');
+                showResponse('history_response', result.data);
+            } else {
+                showStatus('history_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('history_response', result.data, true);
+            }
+        }
+        
+        async function getPending() {
+            const ward = document.getElementById('pending_ward').value;
+            showStatus('pending_status', 'Loading...', 'loading');
+            
+            const result = await makeRequest(`/inspection/pending?ward_number=${ward}`, 'GET');
+            
+            if (result.success) {
+                showStatus('pending_status', '✓ Pending retrieved', 'success');
+                showResponse('pending_response', result.data);
+            } else {
+                showStatus('pending_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('pending_response', result.data, true);
+            }
+        }
+        
+        async function getStats() {
+            showStatus('stats_status', 'Loading...', 'loading');
+            
+            const result = await makeRequest('/inspection/stats', 'GET');
+            
+            if (result.success) {
+                showStatus('stats_status', '✓ Stats retrieved', 'success');
+                showResponse('stats_response', result.data);
+            } else {
+                showStatus('stats_status', '✗ Error: ' + (result.error || result.data.message), 'error');
+                showResponse('stats_response', result.data, true);
+            }
+        }
+        
+        function generateBase64Sample() {
+            // Generate a simple base64 encoded image (1x1 pixel yellow PNG)
+            const sampleBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+            document.getElementById('photo_data').value = sampleBase64;
+            showStatus('demo_status', '✓ Sample Base64 image generated', 'success');
+            showResponse('demo_response', {message: 'Sample 1x1 pixel PNG created and inserted into Photo field'});
+        }
+        
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = `response ${isError ? 'error' : ''}`;
+        }
+        
+        // Set token from localStorage if available
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                console.log('Token found in localStorage');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Street Light Control API - Test Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 25px; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:hover { background: #0056b3; }
+        .output {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #0069d9; }
+        .token-display {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .endpoint-list {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔦 Street Light Control API - Test Flow</h1>
+        
+        <div class="endpoint-list">
+            <strong>API Base URL:</strong> http://localhost:8000/api<br>
+            <strong>Default Admin:</strong> admin@streetlight.com / admin123<br>
+            <strong>City:</strong> Delhi
+        </div>
+
+        <!-- STEP 1: Login -->
+        <div class="test-section">
+            <h2>Step 1: Login (Get Token)</h2>
+            <p>Login with default admin credentials to get JWT token</p>
+            <button onclick="testLogin()">1️⃣ Login & Get Token</button>
+            <div id="loginOutput" class="output"></div>
+        </div>
+
+        <!-- Token Display -->
+        <div id="tokenDisplay"></div>
+
+        <!-- STEP 2: Get Statistics -->
+        <div class="test-section">
+            <h2>Step 2: Get City Summary (Statistics)</h2>
+            <p>Fetch statistics using the token from login</p>
+            <button onclick="testStatistics()">2️⃣ Get Statistics</button>
+            <div id="statsOutput" class="output"></div>
+        </div>
+
+        <!-- STEP 3: Get Lights -->
+        <div class="test-section">
+            <h2>Step 3: Get Light List</h2>
+            <p>Fetch all street lights in the city</p>
+            <button onclick="testGetLights()">3️⃣ Get Lights</button>
+            <div id="lightsOutput" class="output"></div>
+        </div>
+
+        <!-- STEP 4: Control Light -->
+        <div class="test-section">
+            <h2>Step 4: Control a Light</h2>
+            <p>Turn light SL001 ON</p>
+            <button onclick="testControlLight()">4️⃣ Control Light (ON)</button>
+            <div id="controlOutput" class="output"></div>
+        </div>
+
+        <!-- STEP 5: Device Endpoints -->
+        <div class="test-section">
+            <h2>Step 5: Device Communication (No Auth Required)</h2>
+            <p>Test device endpoints that don't require authentication</p>
+            <button onclick="testDeviceConfigure()">5️⃣ Device Configure</button>
+            <button onclick="testDeviceStatus()">Device Status</button>
+            <div id="deviceOutput" class="output"></div>
+        </div>
+
+        <!-- Debug Section -->
+        <div class="test-section">
+            <h2>Debug</h2>
+            <button onclick="clearAllOutputs()">Clear All Output</button>
+            <button onclick="showStoredToken()">Show Stored Token</button>
+            <button onclick="testAllEndpoints()">Run Full Test Flow</button>
+            <div id="debugOutput" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let TOKEN = localStorage.getItem('testToken') || null;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            let color = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#0069d9';
+            const html = `<span style="color: ${color};">[${timestamp}] ${type.toUpperCase()}: ${escapeHtml(message)}</span>\n`;
+            element.innerHTML += html;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function testLogin() {
+            const output = 'loginOutput';
+            log(output, 'Attempting login...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@streetlight.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.data && data.data.token) {
+                    TOKEN = data.data.token;
+                    localStorage.setItem('testToken', TOKEN);
+                    log(output, 'Login successful!', 'success');
+                    log(output, `Token: ${TOKEN.substring(0, 50)}...`, 'success');
+                    log(output, `User: ${data.data.user.name} (${data.data.user.role})`, 'success');
+                    
+                    // Update token display
+                    document.getElementById('tokenDisplay').innerHTML = `
+                        <div class="token-display">
+                            <strong>✅ Token Stored:</strong><br>
+                            Email: ${data.data.user.email}<br>
+                            City: ${data.data.user.city}<br>
+                            Role: ${data.data.user.role}
+                        </div>
+                    `;
+                } else {
+                    log(output, `Login failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStatistics() {
+            const output = 'statsOutput';
+            
+            if (!TOKEN) {
+                log(output, 'No token found. Please login first!', 'error');
+                return;
+            }
+
+            log(output, 'Fetching statistics...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/lights/summary?city=Delhi`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${TOKEN}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(output, 'Statistics fetched!', 'success');
+                    log(output, JSON.stringify(data, null, 2), 'success');
+                } else {
+                    log(output, `Error: ${response.status} - ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetLights() {
+            const output = 'lightsOutput';
+            
+            if (!TOKEN) {
+                log(output, 'No token found. Please login first!', 'error');
+                return;
+            }
+
+            log(output, 'Fetching lights...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/lights/list?city=Delhi`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${TOKEN}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(output, `Fetched ${data.length || 0} lights`, 'success');
+                    log(output, JSON.stringify(data, null, 2), 'success');
+                } else {
+                    log(output, `Error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testControlLight() {
+            const output = 'controlOutput';
+            
+            if (!TOKEN) {
+                log(output, 'No token found. Please login first!', 'error');
+                return;
+            }
+
+            log(output, 'Controlling light SL001...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/lights/control`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        lightId: 'SL001',
+                        action: 'on'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(output, 'Light control successful!', 'success');
+                    log(output, JSON.stringify(data, null, 2), 'success');
+                } else {
+                    log(output, `Error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeviceConfigure() {
+            const output = 'deviceOutput';
+            log(output, 'Configuring device...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/device/configure`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        device_id: 'DEV001',
+                        device_name: 'Test Device',
+                        location: 'Test Location',
+                        ip_address: '192.168.1.100'
+                    })
+                });
+
+                const data = await response.json();
+                log(output, JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeviceStatus() {
+            const output = 'deviceOutput';
+            log(output, 'Updating device status...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/device/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        device_id: 'DEV001',
+                        status: 'online',
+                        battery: 95,
+                        signal: -50
+                    })
+                });
+
+                const data = await response.json();
+                log(output, JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+            } catch (error) {
+                log(output, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showStoredToken() {
+            const output = 'debugOutput';
+            if (TOKEN) {
+                log(output, `Current token: ${TOKEN.substring(0, 50)}...`, 'info');
+            } else {
+                log(output, 'No token stored', 'error');
+            }
+        }
+
+        function clearAllOutputs() {
+            document.querySelectorAll('.output').forEach(el => el.innerHTML = '');
+        }
+
+        async function testAllEndpoints() {
+            clearAllOutputs();
+            await testLogin();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testStatistics();
+            await testGetLights();
+            await testControlLight();
+        }
+
+        // Load token from localStorage on page load
+        window.addEventListener('load', () => {
+            if (TOKEN) {
+                document.getElementById('tokenDisplay').innerHTML = `
+                    <div class="token-display">
+                        <strong>✅ Token found in storage</strong><br>
+                        ${TOKEN.substring(0, 50)}...
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

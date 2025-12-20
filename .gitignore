@@ -1,0 +1,16 @@
+.DS_Store
+.env
+*.log
+node_modules/
+dist/
+build/
+.idea/
+.vscode/
+*.swp
+*.swo
+__pycache__/
+*.pyc
+vendor/
+composer.lock
+.env.local
+.env.*.local
