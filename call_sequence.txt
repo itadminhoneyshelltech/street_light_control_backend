@@ -1,0 +1,150 @@
+
+
+================================================================================================
+1st time configure: Table: configure
+
+curl.exe -X POST "http://127.0.0.1:9001/api/configure" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"rr_no\":\"CL 14259171\",\"constituency\":\"Central\",\"zone_ulb\":\"Shiggaon Cons\",\"ward\":\"Shiggaon\",\"pole\":5,\"conn_pole\":4,\"arm\":\"A\",\"lamp_type\":\"LED\",\"Board_no\":\"BRD-77\",\"watts\":120,\"location_address\":\"(08)MARKET-ROAD-NEARBY-GANJIGATTI-CLOTH-STOREE\",\"service_type\":\"SC\",\"mode\":\"Auto\",\"phone_no\":\"5755183074398\",\"imei_no\":\"8659620586468576\",\"sim_no\":\"8991012345678901234\",\"latitude\":\"14.91855\",\"longitude\":\"75.26258\",\"phase\":\"single\",\"configured_on_time\":\"18:00\",\"configured_off_time\":\"06:00\",\"time_zone\":\"Asia/Kolkata\",\"event\":\"configure\",\"date\":\"2025-12-24\"}"
+
+-> All Success
+================================================================================================
+
+
+
+================================================================================================
+2nd time: configure: Table: configure
+
+curl.exe -X POST "http://127.0.0.1:9001/api/configure" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"rr_no\":\"CL 14259171\",\"constituency\":\"Central\",\"zone_ulb\":\"Shiggaon Cons\",\"ward\":\"Shiggaon\",\"pole\":5,\"conn_pole\":4,\"arm\":\"A\",\"lamp_type\":\"LED\",\"Board_no\":\"BRD-77\",\"watts\":120,\"location_address\":\"(08)MARKET-ROAD-NEARBY-GANJIGATTI-CLOTH-STOREE\",\"service_type\":\"SC\",\"mode\":\"Auto\",\"phone_no\":\"5755183074398\",\"imei_no\":\"8659620586468576\",\"sim_no\":\"8991012345678901234\",\"latitude\":\"14.91855\",\"longitude\":\"75.26258\",\"phase\":\"single\",\"configured_on_time\":\"18:00\",\"configured_off_time\":\"06:00\",\"time_zone\":\"Asia/Kolkata\",\"event\":\"configure\",\"date\":\"2025-12-24\"}"
+
+-> AlreadyConfigured.
+================================================================================================
+
+
+
+================================================================================================
+3nd time: reconfigure: Table: configure
+
+curl.exe -X POST "http://127.0.0.1:9001/api/reconfigure" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"rr_no\":\"CL 14259171\",\"constituency\":\"Central\",\"zone_ulb\":\"Shiggaon Cons\",\"ward\":\"Shiggaon\",\"pole\":5,\"conn_pole\":4,\"arm\":\"A\",\"lamp_type\":\"LED\",\"Board_no\":\"BRD-77\",\"watts\":120,\"location_address\":\"(08)MARKET-ROAD-NEARBY-GANJIGATTI-CLOTH-STOREE\",\"service_type\":\"SC\",\"mode\":\"Auto\",\"phone_no\":\"5755183074398\",\"imei_no\":\"8659620586468576\",\"sim_no\":\"8991012345678901234\",\"latitude\":\"14.91855\",\"longitude\":\"75.26258\",\"phase\":\"single\",\"configured_on_time\":\"18:00\",\"configured_off_time\":\"06:00\",\"time_zone\":\"Asia/Kolkata\",\"event\":\"reconfigure\",\"date\":\"2025-12-24\"}"
+
+-> Insert the new data. (dont disuturb existing)
+================================================================================================
+
+
+
+================================================================================================
+4th call:  Table: configure
+
+curl.exe -X DELETE "http://127.0.0.1:9001/api/configure_delete" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"rr_no\":\"CL 14259171\",\"constituency\":\"Central\",\"zone_ulb\":\"Shiggaon Cons\",\"ward\":\"Shiggaon\",\"pole\":5,\"conn_pole\":4,\"arm\":\"A\",\"lamp_type\":\"LED\",\"Board_no\":\"BRD-77\",\"watts\":120,\"location_address\":\"(08)MARKET-ROAD-NEARBY-GANJIGATTI-CLOTH-STOREE\",\"service_type\":\"SC\",\"mode\":\"Auto\",\"phone_no\":\"5755183074398\",\"imei_no\":\"8659620586468576\",\"sim_no\":\"8991012345678901234\",\"latitude\":\"14.91855\",\"longitude\":\"75.26258\",\"phase\":\"single\",\"configured_on_time\":\"18:00\",\"configured_off_time\":\"06:00\",\"time_zone\":\"Asia/Kolkata\",\"event\":\"configure_delete\",\"date\":\"2025-12-24:12:34:23\"}"
+
+-> Delete all the entries for that UID.
+================================================================================================
+
+
+
+
+
+================================================================================================
+
+Status CURL
+curl.exe -X POST "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"event\":\"periodic_status\",\"date\":\"2025-12-24:12:34:23\",\"actual_on_time\":\"18:00:00\",\"actual_off_time\":\"06:00:00\",\"r_volt\":230.5,\"y_volt\":229.9,\"b_volt\":231.2,\"r_cur\":2.1,\"y_cur\":2.0,\"b_cur\":2.2,\"r_kw\":0.45,\"y_kw\":0.44,\"b_kw\":0.46,\"r_pf\":0.98,\"y_pf\":0.97,\"b_pf\":0.99,\"battery_status\":94.2,\"battery_backup_hrs\":6.5,\"day_open_reading\":1234.5,\"day_close_reading\":1240.7,\"cur_reading\":1240.7,\"baseline_kWh\":1200.0,\"adjusted_baseline_kWh\":1195.0,\"actual_consumption_kWh\":5.8,\"energy_saved_kWh\":0.3,\"energy_saving_per\":5.17,\"lamp_burning_per\":98.0,\"status\":\"ok\",\"CCMS_STATUS\":\"online\"}"
+
+Ensure date is modified periodically.
+and perform insert into "status" table.
+
+================================================================================================
+
+
+================================================================================================
+
+Status CURL
+curl.exe -X POST "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"event\":\"day_start_report\",\"date\":\"2025-12-24:12:34:23\",\"actual_on_time\":\"18:00:00\",\"actual_off_time\":\"06:00:00\",\"r_volt\":230.5,\"y_volt\":229.9,\"b_volt\":231.2,\"r_cur\":2.1,\"y_cur\":2.0,\"b_cur\":2.2,\"r_kw\":0.45,\"y_kw\":0.44,\"b_kw\":0.46,\"r_pf\":0.98,\"y_pf\":0.97,\"b_pf\":0.99,\"battery_status\":94.2,\"battery_backup_hrs\":6.5,\"day_open_reading\":1234.5,\"day_close_reading\":1240.7,\"cur_reading\":1240.7,\"baseline_kWh\":1200.0,\"adjusted_baseline_kWh\":1195.0,\"actual_consumption_kWh\":5.8,\"energy_saved_kWh\":0.3,\"energy_saving_per\":5.17,\"lamp_burning_per\":98.0,\"status\":\"ok\",\"CCMS_STATUS\":\"online\"}"
+
+Ensure date is modified periodically.
+and perform insert into "status" table.
+	
+================================================================================================
+
+
+================================================================================================
+
+Status CURL
+curl.exe -X POST "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"event\":\"day_end_report\",\"date\":\"2025-12-24:12:34:23\",\"actual_on_time\":\"18:00:00\",\"actual_off_time\":\"06:00:00\",\"r_volt\":230.5,\"y_volt\":229.9,\"b_volt\":231.2,\"r_cur\":2.1,\"y_cur\":2.0,\"b_cur\":2.2,\"r_kw\":0.45,\"y_kw\":0.44,\"b_kw\":0.46,\"r_pf\":0.98,\"y_pf\":0.97,\"b_pf\":0.99,\"battery_status\":94.2,\"battery_backup_hrs\":6.5,\"day_open_reading\":1234.5,\"day_close_reading\":1240.7,\"cur_reading\":1240.7,\"baseline_kWh\":1200.0,\"adjusted_baseline_kWh\":1195.0,\"actual_consumption_kWh\":5.8,\"energy_saved_kWh\":0.3,\"energy_saving_per\":5.17,\"lamp_burning_per\":98.0,\"status\":\"ok\",\"CCMS_STATUS\":\"online\"}"
+
+Ensure date is modified periodically.
+and perform insert into "status" table.
+
+
+
+device:
+{
+	while(1)
+		sleep(1min)
+		read_all_params()
+		compose_json_string
+		send_to_backend
+}
+
+================================================================================================
+
+
+================================================================================================
+
+Status CURL
+curl.exe -X POST "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{\"uid\":\"humayun1\",\"event\":\"load_on\",\"date\":\"2025-12-24:12:34:23\",\"actual_on_time\":\"18:00:00\",\"actual_off_time\":\"06:00:00\",\"r_volt\":230.5,\"y_volt\":229.9,\"b_volt\":231.2,\"r_cur\":2.1,\"y_cur\":2.0,\"b_cur\":2.2,\"r_kw\":0.45,\"y_kw\":0.44,\"b_kw\":0.46,\"r_pf\":0.98,\"y_pf\":0.97,\"b_pf\":0.99,\"battery_status\":94.2,\"battery_backup_hrs\":6.5,\"day_open_reading\":1234.5,\"day_close_reading\":1240.7,\"cur_reading\":1240.7,\"baseline_kWh\":1200.0,\"adjusted_baseline_kWh\":1195.0,\"actual_consumption_kWh\":5.8,\"energy_saved_kWh\":0.3,\"energy_saving_per\":5.17,\"lamp_burning_per\":98.0,\"status\":\"ok\",\"CCMS_STATUS\":\"online\"}"
+
+Ensure date is modified periodically.
+and perform insert into "status" table.
+
+================================================================================================
+
+DB:
+	Table1
+		Rw1
+		Rw2
+		
+	Table2:
+		Rw1
+		Rw2
+
+
+
+
+
+
+
+FrontEnd
+--------
+
+curl.exe -X GET "http://127.0.0.1:9001/api/front_end_query" -H "Content-Type: application/json" -d "{trigger:"GiveOverallSummary", }":
+
+	{
+		if 0
+			total_cccms_count=select count(*) unique UID from table=configure
+			total_led_count=select count(*) unique UID from table=configure and add all the lamps
+		#else
+			var1_total_cccms_count = 80
+			var2_total_led_count = 12
+			var3_total_led_count
+			----
+		#endif
+		
+
+		json_string output = compse_response (total_cccms_count, total_led_count)
+					{
+						status: success,
+						var1_total_cccms_count: 80,
+						var2_total_led_count: 245,
+						total_bulb_off: 12
+					}
+					
+					
+		return output
+	}
+
+
+curl.exe -X GET "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{trigger:"StatsForUID", "UID:humayun1"}":
+	{
+		location:91....
+		
+	}
+	
+curl.exe -X GET "http://127.0.0.1:9001/api/status" -H "Content-Type: application/json" -d "{trigger:"GetStatusFor", "UID:humayun1"}":
