@@ -1,11 +1,11 @@
 export function setupStatus(app, pool) {
   const allowedColumns = [
-    'uid','event','date','actual_on_time','actual_off_time',
-    'r_volt','y_volt','b_volt','r_cur','y_cur','b_cur',
-    'r_kw','y_kw','b_kw','r_pf','y_pf','b_pf',
-    'battery_status','battery_backup_hrs','day_open_reading','day_close_reading',
-    'cur_reading','baseline_kWh','adjusted_baseline_kWh','actual_consumption_kWh',
-    'energy_saved_kWh','energy_saving_per','lamp_burning_per','status','CCMS_STATUS'
+    'uid', 'event', 'date', 'actual_on_time', 'actual_off_time',
+    'r_volt', 'y_volt', 'b_volt', 'r_cur', 'y_cur', 'b_cur',
+    'r_kw', 'y_kw', 'b_kw', 'r_pf', 'y_pf', 'b_pf',
+    'battery_status', 'battery_backup_hrs', 'day_open_reading', 'day_close_reading',
+    'cur_reading', 'baseline_kWh', 'adjusted_baseline_kWh', 'actual_consumption_kWh',
+    'energy_saved_kWh', 'energy_saving_per', 'lamp_burning_per', 'status', 'CCMS_STATUS'
   ];
 
   // POST /api/status - create new status record (allows multiple records per UID with different events)
@@ -14,6 +14,16 @@ export function setupStatus(app, pool) {
     const uid = data.uid;
     if (!uid) {
       return res.status(400).json({ status: 'error', error_status: 'uid_required' });
+    }
+    // Verify uid exists in configure table; if not, return error
+    const { checkUidExists } = await import('./util.js');
+    try {
+      const exists = await checkUidExists(pool, uid);
+      if (!exists) {
+        return res.status(404).json({ status: 'error', error_status: 'uid_not_found_in_configure' });
+      }
+    } catch (err) {
+      return res.status(500).json({ status: 'error', error_status: 'db_configure_check_failed' });
     }
 
     console.log('Received status data for UID:', uid, 'Event:', data.event);
