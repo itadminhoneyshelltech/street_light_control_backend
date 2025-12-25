@@ -1,9 +1,10 @@
 export function setupConfigure(app, pool) {
   const allowedColumns = [
-    'uid','rr_no','constituency','zone_ulb','ward','pole','conn_pole','arm','lamp_type','Board_no','watts',
-    'location_address','service_type','mode','phone_no','imei_no','sim_no','latitude','longitude','phase',
-    'configured_on_time','configured_off_time','time_zone',
-    'event','date'
+    'uid', 'rr_no', 'constituency', 'zone_ulb', 'ward', 'pole', 'conn_pole', 'arm', 'lamp_type', 'Board_no', 'watts',
+    'location_address', 'service_type', 'mode', 'phone_no', 'imei_no', 'sim_no', 'latitude', 'longitude', 'phase',
+    'configured_on_time', 'configured_off_time', 'time_zone', 'event', 'date',
+    'ld_watt1', 'ld_watt1_count', 'ld_watt2', 'ld_watt2_count', 'ld_watt3', 'ld_watt3_count',
+    'ld_watt4', 'ld_watt4_count', 'ld_watt5', 'ld_watt5_count', 'ld_watt6', 'ld_watt6_count'
   ];
 
   app.post('/api/configure', async (req, res) => {
@@ -90,7 +91,7 @@ export function setupConfigure(app, pool) {
   });
 
   // Delete configuration by UID
-  app.delete('/api/configure/:uid', async (req, res) => {
+  app.post('/api/delete_configure/:uid', async (req, res) => {
     const { uid } = req.params;
     if (!uid) {
       return res.status(400).json({ status: 'error', error_status: 'uid_required' });

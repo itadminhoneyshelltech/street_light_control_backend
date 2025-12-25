@@ -26,6 +26,10 @@ export async function getOverallSummary(conn) {
   
   // Calculate derived metrics
   const offline_count = total_cccms_count - online_count;
+/**
+ * Represents the total number of street lights that are currently turned on.
+ * @type {number}
+ */
   const total_lights_On = online_count;
   const total_lights_Off = offline_count;
   const total_not_connected = offline_count;
