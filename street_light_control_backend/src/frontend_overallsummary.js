@@ -29,22 +29,49 @@ export async function getOverallSummary(conn) {
 /**
  * Represents the total number of street lights that are currently turned on.
  * @type {number}
- */
+ 
   const total_lights_On = online_count;
   const total_lights_Off = offline_count;
   const total_not_connected = offline_count;
   const total_faulty = error_count;
-  
+ */
+
+    const total_ccms = 134;
+    const total_ccms_on=0;
+    const total_ccms_off=131;
+    const total_ccms_not_comm=3;
+    const total_ccms_working_per=((total_ccms_on/total_ccms)*100).toFixed(2);
+    const total_ccms_faulty_per=((total_ccms_off/total_ccms)*100).toFixed(2);
+
+    const total_energy_saved_today_per = 47.8;
+    const cumulative_energy_saved = 2445609;
+
+    const total_lamps= 6527;
+    const total_lamps_on= 4393;
+    const total_lamps_off= 2134;
+    const total_lamps_not_connected= 0;
+    const total_lamps_faulty= 123;
+    const total_lamps_faulty_per = ((total_lamps_faulty/total_lamps)*100).toFixed(2);
+    const total_lamps_working_per = ((total_lamps_on/total_lamps)*100).toFixed(2);
+
   return {
-    total_lights: total_cccms_count,
-    total_lights_On: total_lights_On,
-    total_lights_Off: total_lights_Off,
-    total_not_connected: total_not_connected,
-    total_faulty: total_faulty,
-    total_watts: total_watts,
-    devices_online: online_count,
-    devices_offline: offline_count,
-    devices_in_error: error_count
+    total_ccms: total_ccms,
+    total_ccms_on: total_ccms_on,
+    total_ccms_off: total_ccms_off,     
+    total_ccms_not_comm: total_ccms_not_comm,
+    total_ccms_working_per: total_ccms_working_per,
+    total_ccms_faulty_per: total_ccms_faulty_per, 
+
+    total_energy_saved_today_per: total_energy_saved_today_per,
+    cumulative_energy_saved: cumulative_energy_saved,
+    
+    total_lamps: total_lamps,
+    total_lamps_on: total_lamps_on,
+    total_lamps_off: total_lamps_off,
+    total_lamps_not_connected: total_lamps_not_connected,
+    total_lamps_faulty: total_lamps_faulty,
+    total_lamps_faulty_per: total_lamps_faulty_per,
+    total_lamps_working_per: total_lamps_working_per
   };
 }
 

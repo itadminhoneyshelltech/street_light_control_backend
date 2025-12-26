@@ -9,7 +9,7 @@ export async function getCCMSList(conn) {
 }
 
 export function setupFrontendCCMS(app, pool) {
-  app.get('/api/ccms-list', async (req, res) => {
+  app.get('/api/ccms_get_detailed_latest_status', async (req, res) => {
     let conn;
     try {
       conn = await pool.getConnection();

@@ -1,7 +1,5 @@
 
 import { getOverallSummary } from './frontend_overallsummary.js';
-import { getTotalLampList } from './frontend_totallamp.js';
-import { getEnergyReport } from './frontend_energyreport.js';
 import { getCCMSList } from './frontend_ccms.js';
 
 export function setupFrontend(app, pool) {
@@ -25,12 +23,7 @@ export function setupFrontend(app, pool) {
         case 'overallSummary':
           responseData = await getOverallSummary(conn);
           break;
-        case 'totallamp':
-          responseData = await getTotalLampList(conn);
-          break;
-        case 'energyreport':
-          responseData = await getEnergyReport(conn);
-          break;
+       
         case 'ccms':
           responseData = await getCCMSList(conn);
           break;

@@ -5,7 +5,8 @@ import mysql from 'mysql2/promise';
 import { setupConfigure } from './configure.js';
 import { setupStatus } from './status.js';
 import { setupFrontend } from './frontend.js';
-import { setupFrontendHome } from './frontend_home1.js';
+import { setupFrontendOverallSummary } from './frontend_overallsummary.js';
+import { setupFrontendCCMS } from './frontend_ccms.js';
 
 dotenv.config();
 
@@ -31,17 +32,18 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// device configuration and management routes
 // Setup configure route
 setupConfigure(app, pool);
 
 // Setup status route
 setupStatus(app, pool);
 
-// Setup frontend query route
-setupFrontend(app, pool);
+// Setup overall summary route
+setupFrontendOverallSummary(app, pool);
 
-// Setup frontend home route
-setupFrontendHome(app, pool);
+// Setup CCMS detailed latest status route
+setupFrontendCCMS(app, pool);
 
 // Test database connection before starting server
 pool.getConnection()
