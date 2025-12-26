@@ -1,0 +1,191 @@
+/* frontend/src/styles/LightControl.css */
+.light-control-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.light-control-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.lights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.light-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.light-card.on {
+  border-color: #ffd700;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
+}
+
+.light-card.off {
+  border-color: #4a90e2;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(74, 144, 226, 0.02) 100%);
+}
+
+.light-card.error {
+  border-color: #ff6b6b;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(255, 107, 107, 0.02) 100%);
+}
+
+.light-card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.light-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+.light-header h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.on {
+  background: #ffd700;
+  color: #333;
+}
+
+.status-badge.off {
+  background: #4a90e2;
+  color: white;
+}
+
+.status-badge.error {
+  background: #ff6b6b;
+  color: white;
+}
+
+.light-details {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.light-details p {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.light-details strong {
+  color: #333;
+}
+
+.error-details {
+  background: #fff3cd;
+  border-left: 4px solid #ff6b6b;
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: #d73a4a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.light-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-on {
+  background: #ffd700;
+  color: #333;
+}
+
+.btn-on:hover:not(:disabled) {
+  background: #ffed4e;
+  transform: translateY(-2px);
+}
+
+.btn-off {
+  background: #4a90e2;
+  color: white;
+}
+
+.btn-off:hover:not(:disabled) {
+  background: #5a9ff5;
+  transform: translateY(-2px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .light-control-container {
+    padding: 20px;
+  }
+
+  .light-control-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .lights-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .light-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .light-controls {
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+}
